@@ -1,4 +1,4 @@
-input_file = open('input.txt', 'r')
+input_file = open('input_full.txt', 'r')
 
 increase_count = 0
 prev_line = None
