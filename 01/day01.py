@@ -5,7 +5,7 @@ def log(input_str):
         print(input_str)
 
 def p1():
-    input_file = open('input_full.txt', 'r')
+    input_file = open('day01_input_full.txt', 'r')
 
     increase_count = 0
     prev_line = None
@@ -32,7 +32,7 @@ def p1():
     print(f"p1: increase_count: {increase_count}")
 
 def p2():
-    input_file = open('input_full.txt', 'r')
+    input_file = open('day01_input_full.txt', 'r')
     increase_count = 0
     prev_window_sum = None
     cur_window = list()
