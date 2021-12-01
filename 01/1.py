@@ -15,7 +15,6 @@ while True:
     line_num = int(line)
 
     if prev_line is not None:
-        print(f"{line_num} > {prev_line} ?")
         if line_num > prev_line:
             increase_count += 1
             
