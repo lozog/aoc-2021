@@ -2,7 +2,7 @@ input_file = open('input.txt', 'r')
 
 increase_count = 0
 prev_line = None
- 
+
 while True:
     # Get next line from file
     line = input_file.readline()
