@@ -1,8 +1,10 @@
-input_file = open('input.txt', 'r')
+input_file = open('../input_full.txt', 'r')
 
 increase_count = 0
-prev_line = None
- 
+prev_window_sum = None
+cur_window = list()
+has_seen_first_window = False
+
 while True:
     # Get next line from file
     line = input_file.readline()
@@ -12,14 +14,22 @@ while True:
     if not line:
         break
 
-    line_num = int(line)
+    cur_window.append(int(line))
 
-    if prev_line is not None:
-        if line_num > prev_line:
-            increase_count += 1
+    if len(cur_window) > 3:
+        cur_window.pop(0)
+
+    if len(cur_window) == 3:
+        cur_window_sum = sum(cur_window)
+        print(f"cur_window: {cur_window}, sum: {cur_window_sum}")
+
+        if prev_window_sum is not None:
+            if cur_window_sum > prev_window_sum:
+                print(f"{cur_window_sum} > {prev_window_sum}")
+                increase_count += 1
             
-    prev_line = line_num
+        prev_window_sum = cur_window_sum
  
 input_file.close()
 
-print(increase_count)
+print(f"increase_count: {increase_count}")
