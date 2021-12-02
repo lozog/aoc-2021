@@ -1,8 +1,8 @@
 DEBUG = True
 
-def log(input_str):
+def log(*args):
     if DEBUG:
-        print(input_str)
+        print(args)
 
 
 input_file = open('day02_input_test.txt', 'r')
