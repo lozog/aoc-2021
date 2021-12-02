@@ -1,17 +1,36 @@
 DEBUG = True
 
-def log(input_str):
+def log(*args):
     if DEBUG:
-        print(input_str)
+        print(args)
 
+def p1():
+    input_file = open('day02_input_full.txt', 'r')
 
-input_file = open('day02_input_test.txt', 'r')
+    h_pos = 0
+    depth = 0
+    
+    while True:
+        line = input_file.readline()
+        if not line:
+            break
 
-while True:
-    line = input_file.readline()
+        command = line.split()
+        direction = command[0]
+        distance = int(command[1])
+        log(direction, distance)
 
-    if not line:
-        break
+        if direction == "forward":
+            h_pos += distance
+        elif direction == "down":
+            depth += distance
+        elif direction == "up":
+            depth -= distance
 
-    log(line)
-input_file.close()
+    input_file.close()
+
+    log(h_pos, depth)
+    res = h_pos * depth
+    print(f"p1: {res}")
+    
+p1()
