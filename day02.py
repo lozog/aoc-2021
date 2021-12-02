@@ -5,7 +5,7 @@ def log(*args):
         print(args)
 
 def p1():
-    input_file = open('day02_input_full.txt', 'r')
+    input_file = open('input/day02_full', 'r')
 
     h_pos = 0
     depth = 0
@@ -34,7 +34,7 @@ def p1():
     print(f"p1: {res}")
     
 def p2():
-    input_file = open('day02_input_full.txt', 'r')
+    input_file = open('input/day02_full', 'r')
 
     h_pos = 0
     depth = 0
