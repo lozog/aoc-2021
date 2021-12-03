@@ -1,10 +1,3 @@
-DEBUG = True
-
-def log(*args):
-    if DEBUG:
-        print(args)
-
-
 input_file = open('day02_input_test.txt', 'r')
 
 while True:
@@ -13,5 +6,5 @@ while True:
     if not line:
         break
 
-    log(line)
+    print(line)
 input_file.close()
