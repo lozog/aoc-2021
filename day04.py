@@ -37,11 +37,11 @@ def has_full_row(board):
             return True
     return False
 
-def find_winner(boards, found_winners=[]):
+def find_winners(boards, found_winners=[]):
     """
     multiple boards can win at once!
     returns list of indices of winning boards
-    or None if none are winning
+    or empty list if none are winning
     """
     new_winners = []
     for board_idx, board in enumerate(boards):
@@ -60,7 +60,7 @@ def find_winner(boards, found_winners=[]):
             new_winners.append(board_idx)
             continue
 
-    return new_winners if len(new_winners) > 0 else None
+    return new_winners
 
 def find_score(winner, last_num):
     sum_of_unmarked_cells = 0
@@ -86,13 +86,14 @@ def apply_num(boards, input_num, found_winners=[]):
     return boards # Object references are passed by value. :smug_look:
 
 def p1():
-    inputs, boards = process_bingo_input('input/day04_test')
+    inputs, boards = process_bingo_input('input/day04_full')
 
     for input_num in inputs:
         boards = apply_num(boards, input_num)
-        winner_idx = find_winner(boards)[0]
+        winners = find_winners(boards)
 
-        if winner_idx:
+        if len(winners) > 0:
+            winner_idx = winners[0]
             break
 
     # assuming we have a winner_idx
@@ -118,11 +119,11 @@ def p2():
     found_winners = []
     for input_num in inputs:
         boards = apply_num(boards, input_num, found_winners)
-        winners_idx = find_winner(boards, found_winners)
+        winners = find_winners(boards, found_winners)
 
-        if winners_idx != None:
-            found_winners = [*found_winners, *winners_idx]
-            last_winner_idx = winners_idx[-1]
+        if len(winners) > 0:
+            found_winners = [*found_winners, *winners]
+            last_winner_idx = winners[-1]
 
             if len(found_winners) == len(boards):
                 # every board has won
