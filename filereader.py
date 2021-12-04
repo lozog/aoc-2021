@@ -1,4 +1,4 @@
-input_file = open('day02_input_test.txt', 'r')
+input_file = open('input/day04_test', 'r')
 
 while True:
     line = input_file.readline()
