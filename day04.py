@@ -20,7 +20,9 @@ def process_bingo_input(file):
 
         board = []
         for i in range(BINGO_DIM):
-            line = [int(char) for char in input_file.readline().split()]
+            # each cell on the board will be a length-2 list: [number, marked]
+            # marked == 1 if number has been called, else 0
+            line = [[int(char), 0] for char in input_file.readline().split()]
             board.append(line)
         boards.append(board)
     input_file.close()
@@ -34,66 +36,47 @@ def find_winner(boards):
     for board_idx, board in enumerate(boards):
         # check rows
         for x, row in enumerate(board):
-            if sum(row) == BINGO_DIM:
+            if sum([cell[1] for cell in row]) == BINGO_DIM:
                 return board_idx
 
         # check columns
         board_transposed = list(zip(*board))
         for x, row in enumerate(board_transposed):
-            if sum(row) == BINGO_DIM:
+            if sum([cell[1] for cell in row]) == BINGO_DIM:
                 return board_idx
-
-        # check diagonals
-        diagonal_1 = [board[i][i] for i in range(len(board))] # from https://www.geeksforgeeks.org/python-print-diagonals-of-2d-list/
-        if sum(diagonal_1) == BINGO_DIM:
-            return board_idx
-        diagonal_2 = [board[i][len(board)-1-i] for i in range(len(board))]
-        if sum(diagonal_2) == BINGO_DIM:
-            return board_idx
 
     return None
 
-
-# testing find_winner
-# loser = [[1,1,1,0,1],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
-# row_winner = [[1,1,1,1,1],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
-# col_winner = [[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0]]
-# diag1_winner = [[1,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1]]
-# diag2_winner = deepcopy(diag1_winner)
-# diag2_winner.reverse()
-
-# res = find_winner([loser, diag2_winner])
-# print(res)
-
 def p1():
-    inputs, boards = process_bingo_input('input/day04_test')
-    print(inputs)
+    inputs, boards = process_bingo_input('input/day04_full')
+    # print(inputs)
+    last_num = None
 
-    boards_marked = []
-    for i, board in enumerate(boards):
-        boards_marked.append(
-            [
-                [0 for x in range(BINGO_DIM)]
-                for y in range(BINGO_DIM)
-            ]
-        )
-
-    for num in inputs:
-        # print(num)
+    for input_num in inputs:
+        # print(input_num)
+        last_num = input_num
         # go through each board, mark boards_marked if it's a match
         for board_idx, board in enumerate(boards):
             for x, row in enumerate(board):
                 for y, cell in enumerate(row):
-                    if cell == num:
-                        boards_marked[board_idx][x][y] = 1
+                    if cell[0] == input_num:
+                        cell[1] = 1
 
-        winner = find_winner(boards_marked)
+        winner_idx = find_winner(boards)
 
-        if winner:
+        if winner_idx:
             break
 
-    print(winner)
-    for board in boards_marked:
-        pprint(board)
+    # assuming we have a winner_idx
+    print(f"winner: {winner_idx}")
+
+    # find winner score
+    winner = boards[winner_idx]
+    sum_of_unmarked_cells = 0
+    for row in winner:
+        for cell in row:
+            if cell[1] == 0:
+                sum_of_unmarked_cells += cell[0]
+    print(f"p1: {sum_of_unmarked_cells * input_num}")
 
 p1()
