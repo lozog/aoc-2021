@@ -28,24 +28,39 @@ def process_bingo_input(file):
     input_file.close()
     return inputs, boards
 
-def find_winner(boards):
+def has_full_row(board):
     """
-    returns index of winning board
+    returns True if board has a full marked row
+    """
+    for x, row in enumerate(board):
+        if sum([cell[1] for cell in row]) == BINGO_DIM:
+            return True
+    return False
+
+def find_winner(boards, found_winners=[]):
+    """
+    multiple boards can win at once!
+    returns list of indices of winning boards
     or None if none are winning
     """
+    new_winners = []
     for board_idx, board in enumerate(boards):
+        if board_idx in found_winners or board_idx in new_winners:
+            # skip boards that have already won
+            continue
+
         # check rows
-        for x, row in enumerate(board):
-            if sum([cell[1] for cell in row]) == BINGO_DIM:
-                return board_idx
+        if has_full_row(board):
+            new_winners.append(board_idx)
+            continue
 
         # check columns
         board_transposed = list(zip(*board))
-        for x, row in enumerate(board_transposed):
-            if sum([cell[1] for cell in row]) == BINGO_DIM:
-                return board_idx
+        if has_full_row(board_transposed):
+            new_winners.append(board_idx)
+            continue
 
-    return None
+    return new_winners if len(new_winners) > 0 else None
 
 def find_score(winner, last_num):
     sum_of_unmarked_cells = 0
@@ -55,11 +70,15 @@ def find_score(winner, last_num):
                 sum_of_unmarked_cells += cell[0]
     return sum_of_unmarked_cells * last_num
 
-def apply_num(boards, input_num):
+def apply_num(boards, input_num, found_winners=[]):
     """
     find every cell which matches input_num and set its second bit to 1
     """
-    for board in boards:
+    for board_idx, board in enumerate(boards):
+        if board_idx in found_winners:
+            # skip boards that have already won
+            continue
+
         for row in board:
             for cell in row:
                 if cell[0] == input_num:
@@ -71,7 +90,7 @@ def p1():
 
     for input_num in inputs:
         boards = apply_num(boards, input_num)
-        winner_idx = find_winner(boards)
+        winner_idx = find_winner(boards)[0]
 
         if winner_idx:
             break
@@ -85,4 +104,32 @@ def p1():
     
     return winner_idx
 
-p1()
+# p1()
+
+def print_board_marks(board):
+    pprint([
+        [cell[1] for cell in row]
+        for row in board
+    ])
+
+def p2():
+    inputs, boards = process_bingo_input('input/day04_full')
+
+    found_winners = []
+    for input_num in inputs:
+        boards = apply_num(boards, input_num, found_winners)
+        winners_idx = find_winner(boards, found_winners)
+
+        if winners_idx != None:
+            found_winners = [*found_winners, *winners_idx]
+            last_winner_idx = winners_idx[-1]
+
+            if len(found_winners) == len(boards):
+                # every board has won
+                break
+
+    last_winner = boards[last_winner_idx]
+    last_winner_score = find_score(last_winner, input_num)
+    print(f"p2: {last_winner_score}")
+
+p2()
