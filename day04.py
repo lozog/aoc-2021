@@ -47,21 +47,30 @@ def find_winner(boards):
 
     return None
 
+def find_score(winner, last_num):
+    sum_of_unmarked_cells = 0
+    for row in winner:
+        for cell in row:
+            if cell[1] == 0:
+                sum_of_unmarked_cells += cell[0]
+    return sum_of_unmarked_cells * last_num
+
+def apply_num(boards, input_num):
+    """
+    find every cell which matches input_num and set its second bit to 1
+    """
+    for board in boards:
+        for row in board:
+            for cell in row:
+                if cell[0] == input_num:
+                    cell[1] = 1
+    return boards # Object references are passed by value. :smug_look:
+
 def p1():
-    inputs, boards = process_bingo_input('input/day04_full')
-    # print(inputs)
-    last_num = None
+    inputs, boards = process_bingo_input('input/day04_test')
 
     for input_num in inputs:
-        # print(input_num)
-        last_num = input_num
-        # go through each board, mark boards_marked if it's a match
-        for board_idx, board in enumerate(boards):
-            for x, row in enumerate(board):
-                for y, cell in enumerate(row):
-                    if cell[0] == input_num:
-                        cell[1] = 1
-
+        boards = apply_num(boards, input_num)
         winner_idx = find_winner(boards)
 
         if winner_idx:
@@ -71,12 +80,9 @@ def p1():
     print(f"winner: {winner_idx}")
 
     # find winner score
-    winner = boards[winner_idx]
-    sum_of_unmarked_cells = 0
-    for row in winner:
-        for cell in row:
-            if cell[1] == 0:
-                sum_of_unmarked_cells += cell[0]
-    print(f"p1: {sum_of_unmarked_cells * input_num}")
+    score = find_score(boards[winner_idx], input_num)
+    print(f"p1: {score}")
+    
+    return winner_idx
 
 p1()
