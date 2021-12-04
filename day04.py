@@ -3,6 +3,7 @@ from pprint import pprint
 
 BINGO_DIM = 5
 
+
 def process_bingo_input(file):
     """
     reads the input file and returns the list of bingo inputs
@@ -28,6 +29,7 @@ def process_bingo_input(file):
     input_file.close()
     return inputs, boards
 
+
 def has_full_row(board):
     """
     returns True if board has a full marked row
@@ -36,6 +38,7 @@ def has_full_row(board):
         if sum([cell[1] for cell in row]) == BINGO_DIM:
             return True
     return False
+
 
 def find_winners(boards, found_winners=[]):
     """
@@ -62,6 +65,7 @@ def find_winners(boards, found_winners=[]):
 
     return new_winners
 
+
 def find_score(winner, last_num):
     sum_of_unmarked_cells = 0
     for row in winner:
@@ -69,6 +73,7 @@ def find_score(winner, last_num):
             if cell[1] == 0:
                 sum_of_unmarked_cells += cell[0]
     return sum_of_unmarked_cells * last_num
+
 
 def apply_num(boards, input_num, found_winners=[]):
     """
@@ -85,6 +90,7 @@ def apply_num(boards, input_num, found_winners=[]):
                     cell[1] = 1
     return boards # Object references are passed by value. :smug_look:
 
+
 def p1():
     inputs, boards = process_bingo_input('input/day04_full')
 
@@ -97,7 +103,7 @@ def p1():
             break
 
     # assuming we have a winner_idx
-    print(f"winner: {winner_idx}")
+    # print(f"winner: {winner_idx}")
 
     # find winner score
     score = find_score(boards[winner_idx], input_num)
@@ -105,13 +111,6 @@ def p1():
     
     return winner_idx
 
-# p1()
-
-def print_board_marks(board):
-    pprint([
-        [cell[1] for cell in row]
-        for row in board
-    ])
 
 def p2():
     inputs, boards = process_bingo_input('input/day04_full')
@@ -133,4 +132,5 @@ def p2():
     last_winner_score = find_score(last_winner, input_num)
     print(f"p2: {last_winner_score}")
 
+p1()
 p2()
