@@ -35,11 +35,12 @@ def read_vents_from_file(file: str):
         res = re.search("([0-9]+\,[0-9]+)\ \-\>\ ([0-9]+\,[0-9]+)", line_input)
 
         start_coords = res.group(1).split(",")
-        start_point = Point(x=int(start_coords[0]), y=int(start_coords[1]))
         end_coords = res.group(2).split(",")
-        end_point = Point(x=int(end_coords[0]), y=int(end_coords[1]))
+        line = Line(
+            start=Point(x=int(start_coords[0]), y=int(start_coords[1])),
+            end=Point(x=int(end_coords[0]), y=int(end_coords[1]))
+        )
 
-        line = Line(start=start_point, end=end_point)
         vents.append(line)
 
     input_file.close()
