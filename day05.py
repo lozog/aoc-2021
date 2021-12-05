@@ -3,7 +3,7 @@ from functools import reduce
 from pprint import pprint
 import re
 
-MAP_LENGTH = 10 # assuming the grid is MAP_LENGTH x MAP_LENGTH
+MAP_LENGTH = 1000 # assuming the grid is MAP_LENGTH x MAP_LENGTH
 
 
 @dataclass
@@ -84,7 +84,7 @@ def find_points_in_line(line: Line):
     return points_in_line
 
 
-vents = read_vents_from_file('input/day05_test')
+vents = read_vents_from_file('input/day05_full')
 # pprint(vents)
 
 vent_map = [
@@ -92,24 +92,25 @@ vent_map = [
     for i in range(0, MAP_LENGTH)
 ]
 
-for vent in vents:
-    # check_for_diagonals = True #p1
-    check_for_diagonals = False #p2
-    
-    if (is_diagonal(vent) and check_for_diagonals):
-        continue
+def find_dangerous_points_count(dont_check_for_diagonals):
+    for vent in vents:
 
-    points_in_line = find_points_in_line(vent)
+        if (is_diagonal(vent) and dont_check_for_diagonals):
+            continue
 
-    for point in points_in_line:
-        vent_map[point.x][point.y] += 1
+        points_in_line = find_points_in_line(vent)
 
-print_matrix(vent_map)
+        for point in points_in_line:
+            vent_map[point.x][point.y] += 1
 
-dangerous_points = sum(
-    [
-        sum([1 for item in row if item >= 2]) 
-        for row in vent_map
-    ]
-)
-print(f"p1: {dangerous_points}")
+    print_matrix(vent_map)
+
+    return sum(
+        [
+            sum([1 for item in row if item >= 2])
+            for row in vent_map
+        ]
+    )
+
+# print(f"p1: {find_dangerous_points_count(True)}")
+print(f"p2: {find_dangerous_points_count(False)}")
