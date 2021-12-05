@@ -3,19 +3,23 @@ from functools import reduce
 from pprint import pprint
 import re
 
-MAP_LENGTH = 1000 # assuming the grid is MAP_LENGTH x MAP_LENGTH
+MAP_LENGTH = 10 # assuming the grid is MAP_LENGTH x MAP_LENGTH
 
 
 @dataclass
 class Point:
     x: int
     y: int
+    def __str__(self):
+        return f"{self.x}, {self.y}"
 
 
 @dataclass
 class Line:
     start: Point
     end: Point
+    def __str__(self):
+        return f"{self.start} -> {self.end}"
 
 
 def transpose(matrix):
@@ -57,21 +61,26 @@ def is_diagonal(line: Line):
     return not (line.start.x == line.end.x or line.start.y == line.end.y)
 
 
-def find_points_in_line(line):
+def find_y_on_line(start: Point, end: Point, x: int):
+    return int( ((x - start.x) * ((end.y - start.y)/(end.x - start.x))) + start.y )
+
+def find_points_in_line(line: Line):
     points_in_line = []
 
     if line.start.x == line.end.x:
         # horizontal
-        start_y = min(line.start.y, line.end.y)
-        end_y = max(line.start.y, line.end.y)
-        points_in_line = [*points_in_line, *[Point(line.start.x, y) for y in range(start_y, end_y + 1)]]
-
-    if line.start.y == line.end.y:
+        direction = 1 if line.start.y < line.end.y else -1
+        new_points = [Point(line.start.x, y) for y in range(line.start.y, line.end.y + direction, direction)]
+    elif line.start.y == line.end.y:
         # vertical
-        start_x = min(line.start.x, line.end.x)
-        end_x = max(line.start.x, line.end.x)
-        points_in_line = [*points_in_line, *[Point(x, line.start.y) for x in range(start_x, end_x + 1)]]
-
+        direction = 1 if line.start.x < line.end.x else -1
+        new_points = [Point(x, line.start.y) for x in range(line.start.x, line.end.x + direction, direction)]
+    else:
+        # diagonal
+        direction = 1 if line.start.x < line.end.x else -1
+        new_points = [Point(x, find_y_on_line(line.start, line.end, x)) for x in range(line.start.x, line.end.x + direction, direction)]
+    
+    points_in_line = [*points_in_line, *new_points]
     return points_in_line
 
 
@@ -84,14 +93,18 @@ vent_map = [
 ]
 
 for vent in vents:
-    if not(is_diagonal(vent)):
-        points_in_line = find_points_in_line(vent)
+    # check_for_diagonals = True #p1
+    check_for_diagonals = False #p2
+    
+    if (is_diagonal(vent) and check_for_diagonals):
+        continue
 
-        for point in points_in_line:
-            vent_map[point.x][point.y] += 1
+    points_in_line = find_points_in_line(vent)
 
+    for point in points_in_line:
+        vent_map[point.x][point.y] += 1
 
-# print_matrix(vent_map)
+print_matrix(vent_map)
 
 dangerous_points = sum(
     [
