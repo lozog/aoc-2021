@@ -3,8 +3,6 @@ from functools import reduce
 from pprint import pprint
 import re
 
-MAP_LENGTH = 1000 # assuming the grid is MAP_LENGTH x MAP_LENGTH
-
 
 @dataclass
 class Point:
@@ -64,6 +62,7 @@ def is_diagonal(line: Line):
 def find_y_on_line(start: Point, end: Point, x: int):
     return int( ((x - start.x) * ((end.y - start.y)/(end.x - start.x))) + start.y )
 
+
 def find_points_in_line(line: Line):
     points_in_line = []
 
@@ -84,15 +83,15 @@ def find_points_in_line(line: Line):
     return points_in_line
 
 
+MAP_LENGTH = 1000 # assuming the grid is MAP_LENGTH x MAP_LENGTH at maximum
 vents = read_vents_from_file('input/day05_full')
 # pprint(vents)
 
-vent_map = [
-    [0 for i in range(0, MAP_LENGTH)]
-    for i in range(0, MAP_LENGTH)
-]
-
 def find_dangerous_points_count(dont_check_for_diagonals):
+    vent_map = [
+        [0 for i in range(0, MAP_LENGTH)]
+        for i in range(0, MAP_LENGTH)
+    ]
     for vent in vents:
 
         if (is_diagonal(vent) and dont_check_for_diagonals):
@@ -103,7 +102,7 @@ def find_dangerous_points_count(dont_check_for_diagonals):
         for point in points_in_line:
             vent_map[point.x][point.y] += 1
 
-    print_matrix(vent_map)
+    # print_matrix(vent_map)
 
     return sum(
         [
@@ -112,5 +111,5 @@ def find_dangerous_points_count(dont_check_for_diagonals):
         ]
     )
 
-# print(f"p1: {find_dangerous_points_count(True)}")
+print(f"p1: {find_dangerous_points_count(True)}")
 print(f"p2: {find_dangerous_points_count(False)}")
