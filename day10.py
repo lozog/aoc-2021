@@ -26,7 +26,7 @@ completion_points = {
 def calc_error_score(line):
     stack = []
     for char in line:
-        if char in ["(", "[", "{", "<"]:
+        if char in pairs.keys():
             stack.append(char)
         else:
             current_char = stack.pop()
@@ -37,7 +37,7 @@ def calc_error_score(line):
 def complete_line(line):
     stack = []
     for char in line:
-        if char in ["(", "[", "{", "<"]:
+        if char in pairs.keys():
             stack.append(char)
         else:
             current_char = stack.pop()
@@ -59,4 +59,5 @@ def p2():
     res = sorted(scores)[int(len(scores) / 2)]
     print(f"p2: {res}")
 
+p1()
 p2()
