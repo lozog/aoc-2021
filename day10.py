@@ -29,17 +29,8 @@ def calc_error_score(line):
         if char in ["(", "[", "{", "<"]:
             stack.append(char)
         else:
-            if len(stack) == 0:
-                # i don't think this is in the input
-                print("stack is empty!")
             current_char = stack.pop()
-            if current_char == "(" and char != pairs[current_char]:
-                return error_points[char]
-            if current_char == "[" and char != pairs[current_char]:
-                return error_points[char]
-            if current_char == "{" and char != pairs[current_char]:
-                return error_points[char]
-            if current_char == "<" and char != pairs[current_char]:
+            if char != pairs[current_char]:
                 return error_points[char]
     return 0
 
@@ -58,7 +49,7 @@ def p1():
 
 def p2():
     error_scores = [calc_error_score(line) for line in data]
-    incomplete_lines = [line for i, line in enumerate(data) if error_scores[i] == 0]
+    incomplete_lines = [line for i, line in enumerate(data) if error_scores[i] == 0] # discard corrupted lines
     scores = []
     for line in incomplete_lines:
         score = 0
@@ -67,6 +58,5 @@ def p2():
         scores.append(score)
     res = sorted(scores)[int(len(scores) / 2)]
     print(f"p2: {res}")
-
 
 p2()
