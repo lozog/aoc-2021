@@ -1,5 +1,4 @@
 from collections import defaultdict
-from copy import deepcopy
 from dataclasses import dataclass
 from functools import reduce
 from pprint import pprint
@@ -112,4 +111,4 @@ def day11(num_steps, octo_map):
     print(f"flash count: {flash_count}")
     return    
 
-day11(1000, deepcopy(octopus_map))
+day11(1000, octopus_map)
