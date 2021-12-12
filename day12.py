@@ -21,7 +21,7 @@ graph = dict(graph)
 # pprint(graph)
 
 # adapted from https://www.python.org/doc/essays/graphs/
-def find_all_paths(graph, start, end, path=[]):
+def find_all_paths_p1(graph, start, end, path=[]):
     path = path + [start]
     if start == end:
         return [path]
@@ -35,7 +35,40 @@ def find_all_paths(graph, start, end, path=[]):
                 paths.append(newpath)
     return paths
 
+# adapted from https://www.python.org/doc/essays/graphs/
+def find_all_paths(graph, start, end, path=[]):
+    path = path + [start]
+
+    if start == end:
+        return [path]
+    if not start in graph:
+        return []
+    paths = []
+
+    # print(",".join(path))
+    small_caves = defaultdict(lambda: 0)
+    for node in path:
+        if node.islower():
+            small_caves[node] += 1
+    # print(dict(small_caves))
+
+    for node in graph[start]:
+        if (
+            node.isupper()
+            or node not in path
+            or (
+                2 not in small_caves.values()
+                and small_caves[node] == 1
+                and node != "start"
+            )
+        ):
+            newpaths = find_all_paths(graph, node, end, path)
+            for newpath in newpaths:
+                paths.append(newpath)
+    return paths
+
 all_paths = find_all_paths(graph, "start", "end")
 res = len(all_paths)
-# pprint(all_paths)
+# for path in all_paths:
+#     print(",".join(path))
 print(f"{res} paths through cave")
