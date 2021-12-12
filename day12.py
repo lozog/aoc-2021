@@ -21,22 +21,7 @@ graph = dict(graph)
 # pprint(graph)
 
 # adapted from https://www.python.org/doc/essays/graphs/
-def find_all_paths_p1(graph, start, end, path=[]):
-    path = path + [start]
-    if start == end:
-        return [path]
-    if not start in graph:
-        return []
-    paths = []
-    for node in graph[start]:
-        if node.isupper() or node not in path: # ignore nodes we've already used
-            newpaths = find_all_paths(graph, node, end, path)
-            for newpath in newpaths:
-                paths.append(newpath)
-    return paths
-
-# adapted from https://www.python.org/doc/essays/graphs/
-def find_all_paths(graph, start, end, path=[]):
+def find_all_paths(graph, start, end, max_small_cave_visits = 1, path=[]):
     path = path + [start]
 
     if start == end:
@@ -57,18 +42,24 @@ def find_all_paths(graph, start, end, path=[]):
             node.isupper()
             or node not in path
             or (
-                2 not in small_caves.values()
-                and small_caves[node] == 1
+                max_small_cave_visits not in small_caves.values()
+                and small_caves[node] <= max_small_cave_visits-1
                 and node != "start"
             )
         ):
-            newpaths = find_all_paths(graph, node, end, path)
+            newpaths = find_all_paths(graph, node, end, max_small_cave_visits, path)
             for newpath in newpaths:
                 paths.append(newpath)
     return paths
 
-all_paths = find_all_paths(graph, "start", "end")
-res = len(all_paths)
-# for path in all_paths:
+p1_paths = find_all_paths(graph, "start", "end", 1)
+p2_paths = find_all_paths(graph, "start", "end", 2)
+
+p1_count = len(p1_paths)
+p2_count = len(p2_paths)
+
+# for path in p2_paths:
 #     print(",".join(path))
-print(f"{res} paths through cave")
+
+print(f"p1: {p1_count}")
+print(f"p2: {p2_count}")
