@@ -15,6 +15,9 @@ class Fold:
     def __repr__(self):
         return f"{self.dim}={self.value}"
 
+def transpose(matrix):
+    return list(map(list, zip(*matrix)))
+
 def parse_file(file: str):
     input_file = open(file, 'r')
     # data = input_file.read()
@@ -35,6 +38,7 @@ def parse_file(file: str):
 
         if dot_coord_section:
             coords = line.split(",")
+            # y,x
             dot = Point(x=int(coords[0]), y=int(coords[1]))
             max_x = max(dot.x, max_x)
             max_y = max(dot.y, max_y)
@@ -54,3 +58,23 @@ pprint(dots)
 pprint(folds)
 print(max_x)
 print(max_y)
+
+dot_map = [
+    [None for y in range(max_y+1)]
+    for x in range(max_x+1)
+]
+
+
+for dot in dots:
+    dot_map[dot.x][dot.y] = dot
+
+def print_matrix(matrix):
+    for row in transpose(matrix):
+        for dot in row:
+            char = "."
+            if dot is not None:
+                char = "#"
+            print(char, end="")
+        print()
+
+print_matrix(dot_map)
