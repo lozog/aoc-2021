@@ -1,6 +1,4 @@
-from collections import Counter, defaultdict
-from functools import reduce
-from math import ceil
+from collections import defaultdict
 from pprint import pprint
 import re
 
