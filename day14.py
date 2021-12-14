@@ -1,4 +1,6 @@
 from collections import Counter, defaultdict
+from functools import reduce
+from math import ceil
 from pprint import pprint
 import re
 
@@ -7,7 +9,7 @@ template = input_file.readline().strip()
 input_file.readline() # skip empty line of input
 data = input_file.read().splitlines()
 
-rules = defaultdict(lambda: "")
+rules = defaultdict(lambda: None)
 for line in data:
     # print(line)
 
@@ -22,27 +24,54 @@ for line in data:
 
 input_file.close()
 
-# pprint(dict(rules))
+rules = dict(rules)
+# pprint(rules)
 
-NUM_STEPS = 10
-
-new_polymer = template
-for step in range(NUM_STEPS):
-    last_index = len(new_polymer) - 1
-    next_polymer = ""
-    for i, char in enumerate(new_polymer):
+def get_occurrences(polymer):
+    occurrences = defaultdict(lambda: 0)
+    last_index = len(polymer) - 1
+    for i, char in enumerate(polymer):
         if i == last_index:
-            next_polymer += char
             break
-        needle = f"{char}{new_polymer[i+1]}"
-        next_polymer += f"{char}{rules[needle]}"
-    new_polymer = next_polymer
-    # print(new_polymer)
+        needle = f"{char}{polymer[i+1]}"
+        occurrences[needle] += 1
+    return occurrences
 
-most_common_count = Counter(list(new_polymer)).most_common()[0][1]
-least_common_count = Counter(list(new_polymer)).most_common()[-1][1]
+NUM_STEPS = 40
 
-print(most_common_count)
-print(least_common_count)
+occurrences = get_occurrences(template)
+# pprint(dict(occurrences))
+for step in range(NUM_STEPS):
+    print(step)
+    new_occurrences = defaultdict(lambda: 0)
+
+    for pair, count in occurrences.items():
+        rule = rules[pair]
+        if rule is not None:
+            new_occurrences[f"{pair[0]}{rule}"] += count
+            new_occurrences[f"{rule}{pair[1]}"] += count
+    occurrences = new_occurrences
+
+
+# pprint(dict(occurrences))
+letter_count = defaultdict(lambda: 0)
+for pair, count in occurrences.items():
+    letter_count[pair[0]] += count
+    letter_count[pair[1]] += count
+
+for letter in letter_count.keys():
+    if letter == template[0]:
+        letter_count[letter] += 1
+    elif letter == template[-1]:
+        letter_count[letter] += 1
+    letter_count[letter] = int(letter_count[letter] / 2)
+
+pprint(dict(letter_count))
+
+most_common_count = max(letter_count.values())
+least_common_count = min(letter_count.values())
+
+# print(most_common_count)
+# print(least_common_count)
 res = most_common_count - least_common_count
 print(res)
