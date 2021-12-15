@@ -1,6 +1,7 @@
+from queue import PriorityQueue
 from pprint import pprint
 
-input_file = open('input/day15_test', 'r')
+input_file = open('input/day15_full', 'r')
 
 graph = dict()
 line_length = None
@@ -17,28 +18,32 @@ for x, line in enumerate(input_file.read().splitlines()):
 
 input_file.close()
 # pprint(graph)
-# print()
 
-def lowest_risk_path(start, end, graph):
-    if start == end:
-        return [end], 0
-    
-    path_a, risk_a = lowest_risk_path(graph[start][1], end, graph)
-    risk_b = None
-    if len(graph[start]) > 2:
-        path_b, risk_b = lowest_risk_path(graph[start][2], end, graph)
+# adapted from https://stackabuse.com/dijkstras-algorithm-in-python/
+def dijkstra(graph, start_vertex):
+    num_vertices = len(graph.keys())
+    visited = []
 
-    if risk_b is None or risk_a < risk_b:
-        return [start, *path_a], risk_a + graph[start][0]
-    else:
-        return [start, *path_b], risk_b + graph[start][0]
+    # D will hold the lowest risk from start_vertex to every other node
+    D = {v:float('inf') for v in range(num_vertices)}
+    D[start_vertex] = 0
 
-path, risk = lowest_risk_path(0, (line_length**2)-1, graph)
-# print()
-# print(f"path: {path}")
-print(f"risk: {risk}")
-# print()
+    pq = PriorityQueue()
+    pq.put((0, start_vertex))
 
-# for node in path:
-#     # print(node)
-#     print(graph[node][0])
+    while not pq.empty():
+        (dist, current_vertex) = pq.get()
+        visited.append(current_vertex)
+        for neighbor in graph[current_vertex][1:]:
+            risk = graph[neighbor][0]
+            if neighbor not in visited:
+                old_cost = D[neighbor]
+                new_cost = D[current_vertex] + risk
+                if new_cost < old_cost:
+                    pq.put((new_cost, neighbor))
+                    D[neighbor] = new_cost
+    return D
+
+end = len(graph.keys()) - 1
+res = dijkstra(graph, 0)[end]
+print(res)
