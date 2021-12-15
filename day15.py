@@ -61,35 +61,67 @@ def print_graph(graph, line_length, full_map_factor):
             print()
 
 # p2
-full_graph = dict()
-full_map_factor = 5
-full_line_length = line_length * full_map_factor
+# full_graph = dict()
+# full_map_factor = 5
+# full_line_length = line_length * full_map_factor
 
-for j in range(full_map_factor):
-    for x, line in enumerate(lines):
-        for i in range(full_map_factor):
-            for y, risk in enumerate(line):
-                cur_node_index = x*(line_length*(full_map_factor)) + y+(line_length*i) + grid_size*full_map_factor*j
-                full_graph[cur_node_index] = []
-                new_risk = (int(risk) + i + j) 
-                if new_risk > 9:
-                    new_risk -= 9
-                full_graph[cur_node_index].append(new_risk)
-                # print(x, y, i, j, risk, full_graph[cur_node_index], cur_node_index)
-                if line_length * j + (x+1) <= full_line_length - 1:
-                    full_graph[cur_node_index].append((x+1)*(line_length*(full_map_factor)) + y+(line_length*i) + grid_size*full_map_factor*j)
-                if line_length * i + (y+1) <= full_line_length - 1:
-                    full_graph[cur_node_index].append(x*(line_length*(full_map_factor)) + (y+1)+(line_length*i) + grid_size*full_map_factor*j)
+# for j in range(full_map_factor):
+#     for x, line in enumerate(lines):
+#         for i in range(full_map_factor):
+#             for y, risk in enumerate(line):
+#                 cur_node_index = x*(line_length*(full_map_factor)) + y+(line_length*i) + grid_size*full_map_factor*j
+#                 full_graph[cur_node_index] = []
+#                 new_risk = (int(risk) + i + j) 
+#                 if new_risk > 9:
+#                     new_risk -= 9
+#                 full_graph[cur_node_index].append(new_risk)
+#                 # print(x, y, i, j, risk, full_graph[cur_node_index], cur_node_index)
+#                 if line_length * j + (x+1) <= full_line_length - 1:
+#                     full_graph[cur_node_index].append((x+1)*(line_length*(full_map_factor)) + y+(line_length*i) + grid_size*full_map_factor*j)
+#                 if line_length * i + (y+1) <= full_line_length - 1:
+#                     full_graph[cur_node_index].append(x*(line_length*(full_map_factor)) + (y+1)+(line_length*i) + grid_size*full_map_factor*j)
 
 # print_graph(full_graph, line_length, full_map_factor)
 # pprint(full_graph)
 
-end = len(full_graph.keys()) - 1
-res = dijkstra(full_graph, 0)[end]
-print(res)
+# end = len(full_graph.keys()) - 1
+# res = dijkstra(full_graph, 0)[end]
+# print(res)
 
+# attempt 2:
+full_map_factor = 5
+i = 4
+j = 4
+new_tile = dict()
+for position, node in graph.items():
+    new_node = node
+    new_risk = node[0] + i + j
+    if new_risk > 9:
+        new_risk -= 9
+    new_node[0] = new_risk
+    new_tile[position] = new_node
+
+pprint(new_tile)
+print_graph(graph, line_length, 1)
+
+# do this for each of top row and left col
+cur_min = float('inf')
+end = grid_size - 1
+for start_candidate in range(line_length): # each of first row
+    res = dijkstra(new_tile, start_candidate)[end]
+    if res < cur_min:
+        cur_min = res
+for row in range(line_length): # first of each col
+    res = dijkstra(new_tile, line_length * row)[end]
+    if res < cur_min:
+        cur_min = res
+print(cur_min)
+print(2 + 5 + 3 + 2 + 2 + 4 + 1 + 4 + 3 + 1 + 2 + 3 + 3 + 4 + 7 + 9)
+
+res = dijkstra(new_tile, 30)[end]
+print(res)
 """
-A better approach:
+approach 2:
 1. take input graph
 2. transform it into the bottom right tile
 3. calculate the lowest risk path from every position in the first row & col to the end position
@@ -98,4 +130,7 @@ A better approach:
   5a. ignore the first col if the tile is all the way on the left, ditto the first row if the tile is at the top
 6. once you get to the first tile, calculate path from start position
 7. add all these together
+
+# this assumes that the shortest path for the last tile will be the same as the shortest path
+# when starting from the entire grid, which is not true!
 """
