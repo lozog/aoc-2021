@@ -60,7 +60,7 @@ def print_graph(graph, line_length, full_map_factor):
                     print(graph[row*line_length*full_map_factor + col+(line_length*i) + grid_size*full_map_factor*j][0], end="")
             print()
 
-# p2
+# p2 attempt 1
 # full_graph = dict()
 # full_map_factor = 5
 # full_line_length = line_length * full_map_factor
@@ -88,49 +88,54 @@ def print_graph(graph, line_length, full_map_factor):
 # res = dijkstra(full_graph, 0)[end]
 # print(res)
 
-# attempt 2:
-full_map_factor = 5
-i = 4
-j = 4
-new_tile = dict()
-for position, node in graph.items():
-    new_node = node
-    new_risk = node[0] + i + j
-    if new_risk > 9:
-        new_risk -= 9
-    new_node[0] = new_risk
-    new_tile[position] = new_node
+# p2 attempt 2
 
-pprint(new_tile)
-print_graph(graph, line_length, 1)
+import numpy as np
+import sys
+from skimage.graph import route_through_array
 
-# do this for each of top row and left col
-cur_min = float('inf')
-end = grid_size - 1
-for start_candidate in range(line_length): # each of first row
-    res = dijkstra(new_tile, start_candidate)[end]
-    if res < cur_min:
-        cur_min = res
-for row in range(line_length): # first of each col
-    res = dijkstra(new_tile, line_length * row)[end]
-    if res < cur_min:
-        cur_min = res
-print(cur_min)
-print(2 + 5 + 3 + 2 + 2 + 4 + 1 + 4 + 3 + 1 + 2 + 3 + 3 + 4 + 7 + 9)
+np.set_printoptions(linewidth=np.inf, threshold=sys.maxsize)
+input_file = open('input/day15_full', 'r')
 
-res = dijkstra(new_tile, 30)[end]
-print(res)
-"""
-approach 2:
-1. take input graph
-2. transform it into the bottom right tile
-3. calculate the lowest risk path from every position in the first row & col to the end position
-4. find the tile adjacent to that. e.g. if lowest path is from a position in the first col, take the tile to the left
-5. find the lowest risk path from any position in the first row & col to the position next to the start of the next tile
-  5a. ignore the first col if the tile is all the way on the left, ditto the first row if the tile is at the top
-6. once you get to the first tile, calculate path from start position
-7. add all these together
+graph = []
+line_length = 0
+for line in input_file.read().splitlines():
+    line_length = len(line) # assume square
+    graph.append([int(char) for char in line])
 
-# this assumes that the shortest path for the last tile will be the same as the shortest path
-# when starting from the entire grid, which is not true!
-"""
+input_file.close()
+
+graph = np.array(graph)
+grid_size = (line_length+1)**2
+factor = 5
+
+def f(x, i):
+    x += i
+    if x > 9:
+        x -= 9
+    return x
+
+vfunc = np.vectorize(f)
+
+first_tile_row = graph.copy()
+for i in range(1, factor):
+    new_tile = vfunc(graph, i)
+    # print(new_tile)
+    first_tile_row = np.concatenate((first_tile_row,new_tile),axis=1)
+# print(first_tile_row)
+
+full_graph = first_tile_row.copy()
+for j in range(1, factor):
+    new_tile = vfunc(first_tile_row, j)
+    # print(new_tile)
+    full_graph = np.concatenate((full_graph,new_tile),axis=0)
+
+# print(full_graph)
+
+full_length = line_length * factor
+res = route_through_array(full_graph, [0, 0], [full_length-1, full_length-1], fully_connected=False)
+path = res[0]
+# pprint(res[0])
+cost = sum([full_graph[node[0]][node[1]] for node in path]) - full_graph[0][0]
+print(cost)
+# print(res[1])
