@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from pprint import pprint
 import re
-from scipy.optimize import minimize
 
 @dataclass
 class Point:
