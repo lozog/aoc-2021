@@ -4,53 +4,50 @@ from typing import Type, Union
 
 @dataclass
 class Snail:
-    l: Union[int, Type["Snail"]] = None
-    r: Union[int, Type["Snail"]] = None
+    val: int = None
+    l: Type["Snail"] = None
+    r: Type["Snail"] = None
     parent: Type["Snail"] = None
     def __repr__(self):
+        if self.val is not None:
+            return f"{self.val}"
         return f"[{self.l},{self.r}]"
 
+
 def snail_from_list(snail_list, parent=None):
-    l = snail_list[0]
-    r = snail_list[1]
+    l = None
+    r = None
     
-    if type(l) != int:
-        l = snail_from_list(l, None)
-    
-    if type(r) != int:
-        r = snail_from_list(r, None)
+    if type(snail_list[0]) == int:
+        l = Snail(val=snail_list[0])
+    else:
+        l = snail_from_list(snail_list[0])
 
-    new_snail = Snail(l=l, r=r, parent=parent)
-    new_snail.l = l
-    new_snail.r = r
-
-    if type(l) != int:
-        new_snail.l.parent = new_snail
+    if type(snail_list[1]) == int:
+        r = Snail(val=snail_list[1])
+    else:
+        r = snail_from_list(snail_list[1])
     
-    if type(r) != int:
-        new_snail.r.parent = new_snail
+    new_snail = Snail(l=l, r=r)
+    new_snail.l.parent = new_snail
+    new_snail.r.parent = new_snail
 
     return new_snail
 
 
 def add_snails(s1, s2):
     new_snail = Snail(l=s1, r=s2)
-    if type(new_snail.l) != int:
-        new_snail.l.parent = new_snail
-    if type(new_snail.r) != int:
-        new_snail.r.parent = new_snail
+    new_snail.l.parent = new_snail
+    new_snail.r.parent = new_snail
     return new_snail
 
 # def reduce_snail(snail):
 #     return snail
 
 # test1 = snail_from_list([[[[[9,8],1],2],3],4])
-test1 = snail_from_list([1,2])
-test2 = snail_from_list([[3, 4], 5])
-print(test2.l)
-print(test2.l.l.parent)
+test1 = snail_from_list([[[[4,3],4],4],[7,[[8,4],9]]])
+test2 = snail_from_list([1,1])
 
-# test3 = add_snails(test1, test2)
-# print(test3)
 
-# print(test3.r.l.parent)
+test3 = add_snails(test1, test2)
+print(test3)
