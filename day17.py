@@ -41,6 +41,7 @@ def probe(x_vel, y_vel):
             and pos.y <= y_max
         ):
             # print("hit!")
+            return True # p2
             break
         
         if (
@@ -48,22 +49,25 @@ def probe(x_vel, y_vel):
             or pos.y < y_min
         ):
             # print("miss!")
-            return -1
+            return False # p2
             break
     return max_height
 
 # brute force
-# range of guesses to find max height within
-x_vel_min = -50
-x_vel_max = 200
-y_vel_min = -200
-y_vel_max = 200
+x_vel_min = 0
+x_vel_max = 700
+y_vel_min = -500
+y_vel_max = 500
 
 max_heights = []
-for x_vel in range(x_vel_min, x_vel_max):
-    for y_vel in range(y_vel_min, y_vel_max):
+for x_vel in range(x_vel_min, x_vel_max+1):
+    for y_vel in range(y_vel_min, y_vel_max+1):
         res = probe(x_vel, y_vel)
-        # print(f"{x_vel} {y_vel} {res}")
-        max_heights.append([res, x_vel, y_vel])
+        # if res != -1: # p1
+        if res == True: # p2
+            print(f"{x_vel} {y_vel} {res}")
+            max_heights.append([res, x_vel, y_vel])
 
-print(max([i[0] for i in max_heights]))
+# print(max([i[0] for i in max_heights]))
+pprint(len(max_heights))
+
