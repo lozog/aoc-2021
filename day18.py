@@ -167,6 +167,10 @@ def reduce_once(root_id, snails):
     return False
 
 
+def reduce_until_done(root_id, snails):
+    while reduce_once(root_id, snails):
+        pass
+
 def magnitude(snail):
     if snail.val is not None:
         return snail.val
@@ -190,29 +194,26 @@ def magnitude(snail):
 
 input_file = open("input/day18_full", 'r')
 lines = input_file.read().splitlines()
-snail_numbers = []
+snail_numbers_as_lists = []
 for line in lines:
-    snail_numbers.append(ast.literal_eval(line))
+    snail_numbers_as_lists.append(ast.literal_eval(line))
 input_file.close()
 
-test_snails = []
+snail_numbers = []
 snails = dict()
-for snail_input in snail_numbers:
-    new_snail, new_snails = snail_from_list(snail_input)
-    test_snails.append(new_snail)
+for snail_number_as_list in snail_numbers_as_lists:
+    new_snail, new_snails = snail_from_list(snail_number_as_list)
+    snail_numbers.append(new_snail)
     snails = {**snails, **new_snails}
 
-root = test_snails[0]
-for i, next_snail in enumerate(test_snails):
+# p1
+root = snail_numbers[0]
+for i, next_snail in enumerate(snail_numbers):
     if i == 0:
         continue
     root = add_snails(root, next_snail)
     snails[root._id] = root
-    while True:
-        # print(root)
-        res = reduce_once(root._id, snails)
-        if not res:
-            break
+    reduce_until_done(root._id, snails)
 
 res = magnitude(root)
 print(root)
