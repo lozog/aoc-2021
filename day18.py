@@ -1,5 +1,6 @@
 import ast
 from dataclasses import dataclass
+from itertools import permutations
 from math import ceil, floor
 from pprint import pprint
 from typing import Type
@@ -178,7 +179,14 @@ def magnitude(snail):
         return 3*magnitude(snail.l) + 2*magnitude(snail.r)
 
 
-# snail_numbers = [
+input_file = open("input/day18_full", 'r')
+lines = input_file.read().splitlines()
+snail_numbers_as_lists = []
+for line in lines:
+    snail_numbers_as_lists.append(ast.literal_eval(line))
+input_file.close()
+
+# snail_numbers_as_lists = [
 #     [[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],
 #     [7,[[[3,7],[4,3]],[[6,3],[8,8]]]],
 #     [[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]],
@@ -191,30 +199,40 @@ def magnitude(snail):
 #     [[[[4,2],2],6],[8,7]],
 # ]
 
-
-input_file = open("input/day18_full", 'r')
-lines = input_file.read().splitlines()
-snail_numbers_as_lists = []
-for line in lines:
-    snail_numbers_as_lists.append(ast.literal_eval(line))
-input_file.close()
-
-snail_numbers = []
-snails = dict()
-for snail_number_as_list in snail_numbers_as_lists:
-    new_snail, new_snails = snail_from_list(snail_number_as_list)
-    snail_numbers.append(new_snail)
-    snails = {**snails, **new_snails}
-
 # p1
-root = snail_numbers[0]
-for i, next_snail in enumerate(snail_numbers):
-    if i == 0:
-        continue
-    root = add_snails(root, next_snail)
+# snail_numbers = []
+# snails = dict() # map of snail_id -> snail
+# for snail_number_as_list in snail_numbers_as_lists:
+#     new_snail, new_snails = snail_from_list(snail_number_as_list)
+#     snail_numbers.append(new_snail)
+#     snails = {**snails, **new_snails}
+
+# root = snail_numbers[0]
+# for i, next_snail in enumerate(snail_numbers):
+#     if i == 0:
+#         continue
+#     root = add_snails(root, next_snail)
+#     snails[root._id] = root
+#     reduce_until_done(root._id, snails)
+
+# res = magnitude(root)
+# print(root)
+# print(res)
+
+# p2
+magnitudes = []
+snail_permutations = list(permutations(range(len(snail_numbers_as_lists)), 2))
+for permutation in snail_permutations:
+    s1_list = snail_numbers_as_lists[permutation[0]]
+    s2_list = snail_numbers_as_lists[permutation[1]]
+    s1, s1_snails = snail_from_list(s1_list)
+    s2, s2_snails = snail_from_list(s2_list)
+    snails = {**s1_snails, **s2_snails}
+
+    root = add_snails(s1, s2)
     snails[root._id] = root
     reduce_until_done(root._id, snails)
+    magnitudes.append(magnitude(root))
 
-res = magnitude(root)
-print(root)
+res = max(magnitudes)
 print(res)
