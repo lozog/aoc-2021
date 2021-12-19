@@ -1,3 +1,4 @@
+import ast
 from dataclasses import dataclass
 from math import ceil, floor
 from pprint import pprint
@@ -173,7 +174,7 @@ def magnitude(snail):
         return 3*magnitude(snail.l) + 2*magnitude(snail.r)
 
 
-# test_input = [
+# snail_numbers = [
 #     [[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],
 #     [7,[[[3,7],[4,3]],[[6,3],[8,8]]]],
 #     [[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]],
@@ -186,22 +187,17 @@ def magnitude(snail):
 #     [[[[4,2],2],6],[8,7]],
 # ]
 
-test_input = [
-    [[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]],
-    [[[5,[2,8]],4],[5,[[9,9],0]]],
-    [6,[[[6,2],[5,6]],[[7,6],[4,7]]]],
-    [[[6,[0,7]],[0,9]],[4,[9,[9,0]]]],
-    [[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]],
-    [[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]],
-    [[[[5,4],[7,7]],8],[[8,3],8]],
-    [[9,3],[[9,9],[6,[4,9]]]],
-    [[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]],
-    [[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]
-]
+
+input_file = open("input/day18_full", 'r')
+lines = input_file.read().splitlines()
+snail_numbers = []
+for line in lines:
+    snail_numbers.append(ast.literal_eval(line))
+input_file.close()
 
 test_snails = []
 snails = dict()
-for snail_input in test_input:
+for snail_input in snail_numbers:
     new_snail, new_snails = snail_from_list(snail_input)
     test_snails.append(new_snail)
     snails = {**snails, **new_snails}
