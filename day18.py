@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from math import ceil, floor
 from pprint import pprint
 from typing import Type
 from uuid import uuid4, UUID
@@ -106,7 +107,6 @@ def left_neighbour(snail):
 test, snails = snail_from_list([[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]])
 print(test)
 
-# explode
 def explode(snail_id, snails):
     snail = snails[snail_id]
     leftmost_id = find_leftmost_at_level_4(snail)
@@ -134,6 +134,15 @@ def explode(snail_id, snails):
         right_neighbour_snail = snails[right_neighbour_id]
         right_neighbour_snail.val += leftmost_snail.r.val
 
-explode(test._id, snails)
+# explode(test._id, snails)
+
+def split(snail_id, snails):
+    snail = snails[snail_id]
+    snail.l = Snail(uuid4(), val=floor(snail.val/2), parent=snail)
+    snail.r = Snail(uuid4(), val=ceil(snail.val/2), parent=snail)
+    snail.val = None
+    snails[snail.l._id] = snail.l
+    snails[snail.r._id] = snail.r
+
 print(test)
-# pprint(snails)
+pprint(snails)
