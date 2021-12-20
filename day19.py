@@ -78,8 +78,16 @@ def find_scanner_coords(scanner0, scanner1, overlap_requirement):
     for i, beacon in enumerate(scanner1):
         # if we know which beacons to match up, then we can find the coordinates of the scanner
         # so, we'll find which beacon in scanner1 is beacon0 of scanner0
+        if len(scanner1) - i < overlap_requirement:
+            # optimization: if there are fewer than overlap_requirement left in scanner1, then there aren't enough overlaps between scanner0 and scanner1
+            return None, None
 
-        for beacon0 in scanner0: # we need to pick a beacon from scanner0 that overlaps with scanner1
+        for j, beacon0 in enumerate(scanner0): # we need to pick a beacon from scanner0 that overlaps with scanner1
+            # print(len(scanner0) - j)
+            if len(scanner0) - j < overlap_requirement:
+                # optimization: if there are fewer than overlap_requirement left in scanner0, then there aren't enough overlaps between scanner0 and scanner1
+                continue
+
             for rotation, beacon_rotated in enumerate(all_rotations(beacon)):
                 difference = beacon0 - beacon_rotated # if this is correct, difference is the position of scanner1 relative to scanner0
 
@@ -99,9 +107,26 @@ def find_scanner_coords(scanner0, scanner1, overlap_requirement):
                 # print(f"found {found} matching beacons")
 
                 if found >= overlap_requirement:
-                    return difference, overlaps, rotation
-    return None, None, None
+                    return difference, rotation
+    return None, None
 
+no_overlaps = defaultdict(list)
+
+scanner_info = defaultdict(dict)
+for i, scanner0 in enumerate(scanners):
+    for j, scanner1 in enumerate(scanners):
+        if i == j:
+            continue
+        if j in no_overlaps[i]:
+            print(f"{i} has no overlaps in {j}")
+            continue
+        print(f"checking scanner{i} against scanner{j}")
+        coords, rotation = find_scanner_coords(scanner0, scanner1, 12)
+        if coords is not None:
+            scanner_info[i][j] = [coords, rotation]
+        else:
+            no_overlaps[j].append(i)
+pprint(scanner_info)
 
 
 def convert_to_scanner0_space(beacon, i, scanner_info):
@@ -129,24 +154,26 @@ def convert_to_scanner0_space(beacon, i, scanner_info):
             scanner_info
         )
 
+
+
 # todo: this is hard-coded for the test input
-scanner_info = defaultdict(dict)
-scanner_info = {0: {1: [np.array([   68, -1246,   -43]), 6]},
- 1: {0: [np.array([  68, 1246,  -43]), 6],
-     3: [np.array([  160, -1134,   -23]), 0],
-     4: [np.array([   88,   113, -1104]), 10]},
- 2: {4: [np.array([1125, -168,   72]), 11]},
- 3: {1: [np.array([-160, 1134,   23]), 0]},
- 4: {1: [np.array([-1104,   -88,   113]), 22],
-     2: [np.array([  168, -1125,    72]), 11]}}
+# scanner_info = defaultdict(dict)
+# scanner_info = {0: {1: [np.array([   68, -1246,   -43]), 6]},
+#  1: {0: [np.array([  68, 1246,  -43]), 6],
+#      3: [np.array([  160, -1134,   -23]), 0],
+#      4: [np.array([   88,   113, -1104]), 10]},
+#  2: {4: [np.array([1125, -168,   72]), 11]},
+#  3: {1: [np.array([-160, 1134,   23]), 0]},
+#  4: {1: [np.array([-1104,   -88,   113]), 22],
+#      2: [np.array([  168, -1125,    72]), 11]}}
 # pprint(scanner_info)
 
 
-beacons_in_scanner0_space = []
-for i, scanner in enumerate(scanners):
-    for beacon in scanner:
-        beacon_in_scanner0_space = convert_to_scanner0_space(beacon, i, scanner_info)
-        # print(beacon_in_scanner0_space)
-        if not is_in_list(beacon_in_scanner0_space, beacons_in_scanner0_space):
-            beacons_in_scanner0_space.append(beacon_in_scanner0_space)
-pprint(beacons_in_scanner0_space)
+# beacons_in_scanner0_space = []
+# for i, scanner in enumerate(scanners):
+#     for beacon in scanner:
+#         beacon_in_scanner0_space = convert_to_scanner0_space(beacon, i, scanner_info)
+#         # print(beacon_in_scanner0_space)
+#         if not is_in_list(beacon_in_scanner0_space, beacons_in_scanner0_space):
+#             beacons_in_scanner0_space.append(beacon_in_scanner0_space)
+# pprint(beacons_in_scanner0_space)
