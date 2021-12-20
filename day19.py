@@ -1,9 +1,46 @@
 import numpy as np
-import pprint
+from pprint import pprint
 
 
 def is_in_list(x, arr):
     return any((x == a).all() for a in arr)
+
+
+def all_rotations(coords):
+    """
+    Given a 3D point, returns a list of all 24 rotations
+    """
+    return [
+        np.array([coords[0], coords[1], coords[2]]),
+        np.array([coords[0], -coords[2], coords[1]]),
+        np.array([coords[0], -coords[1], -coords[2]]),
+        np.array([coords[0], coords[2], -coords[1]]),
+
+        np.array([-coords[0], -coords[1], coords[2]]),
+        np.array([-coords[0], coords[2], coords[1]]),
+        np.array([-coords[0], coords[1], -coords[2]]),
+        np.array([-coords[0], -coords[2], -coords[1]]),
+
+        np.array([coords[1], coords[2], coords[0]]),
+        np.array([coords[1], -coords[0], coords[2]]),
+        np.array([coords[1], -coords[2], -coords[0]]),
+        np.array([coords[1], coords[0], -coords[2]]),
+
+        np.array([-coords[1], -coords[2], coords[0]]),
+        np.array([-coords[1], coords[0], coords[2]]),
+        np.array([-coords[1], coords[2], -coords[0]]),
+        np.array([-coords[1], -coords[0], -coords[2]]),
+
+        np.array([coords[2], coords[0], coords[1]]),
+        np.array([coords[2], -coords[1], coords[0]]),
+        np.array([coords[2], -coords[0], -coords[1]]),
+        np.array([coords[2], coords[1], -coords[0]]),
+
+        np.array([-coords[2], -coords[0], coords[1]]),
+        np.array([-coords[2], coords[1], coords[0]]),
+        np.array([-coords[2], coords[0], -coords[1]]),
+        np.array([-coords[2], -coords[1], -coords[0]])
+    ]
 
 
 scanner0 = [
@@ -36,7 +73,7 @@ def find_scanner_coords(scanner0, scanner1):
         # print(beacon0_in_scanner1_space)
 
         if (is_in_list(beacon0_in_scanner1_space, scanner1)):
-            # it should match for enough beacons, and if so then we know that the coords of scanner1 in scanner0 space is (x_distance, y_distance)
+            # it should match for enough beacons, and if so then we know that the coords of scanner1 in scanner0 space is difference
 
             found = all([ # TODO: all? or do we just need at least 12
                 is_in_list(scanner0_beacon - difference, scanner1)
