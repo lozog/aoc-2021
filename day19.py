@@ -63,46 +63,53 @@ for line in lines:
 scanners.append(beacons)
 # pprint(scanners)
 
-scanner0 = [
-    np.array([0,2]),
-    np.array([4,1]),
-    np.array([3,3]),
-]
 
-scanner1 = [
-    np.array([-1,-1]),
-    np.array([-5,0]),
-    np.array([-2,1]),
-]
-
-def find_scanner_coords(scanner0, scanner1):
+def find_scanner_coords(scanner0, scanner1, overlap_requirement):
     """
     Given two lists of beacon coordinates from two scanners, returns the coordinates of
     scanner1 relative to scanner0 if it can, or None if there are not enough overlapping beacons.
     Assumes scanners have the same orientation
     """
+    scanner0_beacons_in_scanner1_space = []
     for beacon in scanner1:
         # if we know which beacons to match up, then we can find the coordinates of the scanner
         # so, we'll find which beacon in scanner1 is beacon0 of scanner0
+
+        # for beacon_rotated in all_rotations(beacon):
+        # print("aye")
 
         beacon0 = scanner0[0]
         difference = beacon0 - beacon
 
         # convert beacon0 (in scanner0 space) to scanner1 space
         beacon0_in_scanner1_space = beacon0 - difference
+        scanner0_beacons_in_scanner1_space.append(beacon0_in_scanner1_space)
         # print(beacon0_in_scanner1_space)
 
-        if (is_in_list(beacon0_in_scanner1_space, scanner1)):
-            # it should match for enough beacons, and if so then we know that the coords of scanner1 in scanner0 space is difference
+    pprint(scanner0_beacons_in_scanner1_space)
 
-            found = all([ # TODO: all? or do we just need at least 12
-                is_in_list(scanner0_beacon - difference, scanner1)
-                for scanner0_beacon in scanner0
-            ])
+    found = len([
+        scanner0_beacon_in_scanner1_space
+        for scanner0_beacon_in_scanner1_space in scanner0_beacons_in_scanner1_space
+        if (is_in_list(scanner0_beacon_in_scanner1_space, scanner1))
+    ])
+    
+    print(f"found {found} matching beacons")
+    
+    # for scanner0_beacon_in_scanner1_space in scanner0_beacons_in_scanner1_space:
+    #     if (is_in_list(scanner0_beacon_in_scanner1_space, scanner1)):
+    #         # it should match for enough beacons, and if so then we know that the coords of scanner1 in scanner0 space is difference
+    #         print(scanner0_beacon_in_scanner1_space)
+    #         found = sum([
+    #             1 if is_in_list(scanner0_beacon - difference, scanner1) else 0
+    #             for scanner0_beacon in scanner0
+    #         ])
 
-            if found:
-                return difference
+    #         print(f"found {found} matching beacons")
+
+    #         if found >= overlap_requirement:
+    #             return difference
     return None
 
-res = find_scanner_coords(scanner0, scanner1)
+res = find_scanner_coords(scanners[0], scanners[1], 12)
 print(res)
