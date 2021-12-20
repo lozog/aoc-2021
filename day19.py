@@ -1,5 +1,6 @@
 import numpy as np
 from pprint import pprint
+import re
 
 
 def is_in_list(x, arr):
@@ -42,6 +43,25 @@ def all_rotations(coords):
         np.array([-coords[2], -coords[1], -coords[0]])
     ]
 
+
+input_file = open('input/day19_test', 'r')
+lines = input_file.read().splitlines()
+input_file.close()
+
+scanners = []
+beacons = []
+for line in lines:
+    if line == "":
+        scanners.append(beacons)
+    elif re.match("--- scanner [0-9]+ ---", line):
+        beacons = []
+    else:
+        res = re.search("(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)", line)
+        beacons.append(
+            np.array([int(res.group(1)), int(res.group(2)), int(res.group(3))])
+        )
+scanners.append(beacons)
+# pprint(scanners)
 
 scanner0 = [
     np.array([0,2]),
