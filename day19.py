@@ -64,52 +64,70 @@ scanners.append(beacons)
 # pprint(scanners)
 
 
+def change_reference(coords, origin, rotation):
+    return origin + all_rotations(np.array(coords))[rotation]
+
+
 def find_scanner_coords(scanner0, scanner1, overlap_requirement):
     """
     Given two lists of beacon coordinates from two scanners, returns the coordinates of
     scanner1 relative to scanner0 if it can, or None if there are not enough overlapping beacons.
-    Assumes scanners have the same orientation
     """
-    scanner0_beacons_in_scanner1_space = []
-    for beacon in scanner1:
+    for i, beacon in enumerate(scanner1):
         # if we know which beacons to match up, then we can find the coordinates of the scanner
         # so, we'll find which beacon in scanner1 is beacon0 of scanner0
 
-        # for beacon_rotated in all_rotations(beacon):
-        # print("aye")
+        # for beacon0 in scanner0:
+        for rotation, beacon_rotated in enumerate(all_rotations(beacon)):
+            # beacon0 = scanner0[0] # they MUST share this beacon
+            beacon0 = scanner0[-1]
+            difference = beacon0 - beacon_rotated
 
-        beacon0 = scanner0[0]
-        difference = beacon0 - beacon
+            scanner1_in_scanner0_space = [
+                all_rotations(scanner1_beacon)[rotation] + difference
+                for scanner1_beacon in scanner1
+            ]
+            
+            if i == 3 and rotation == 10:
+                print(f"{difference} = {beacon0} - {beacon_rotated}")
+                print(f"{change_reference(difference, np.array([68,-1246,-43]), 6)} = {beacon0} - {beacon_rotated} { rotation }")
+                for test in scanner1_in_scanner0_space:
+                    print(change_reference(test, np.array([68,-1246,-43]), 6))
 
-        # convert beacon0 (in scanner0 space) to scanner1 space
-        beacon0_in_scanner1_space = beacon0 - difference
-        scanner0_beacons_in_scanner1_space.append(beacon0_in_scanner1_space)
-        # print(beacon0_in_scanner1_space)
+            scanner0_in_scanner1_space = [
+                all_rotations(scanner0_beacon - difference)[rotation]
+                for scanner0_beacon in scanner0
+            ]
 
-    pprint(scanner0_beacons_in_scanner1_space)
+            overlaps = [
+                scanner1_beacon
+                for scanner1_beacon in scanner1_in_scanner0_space
+                if is_in_list(scanner1_beacon, scanner0)
+            ]
 
-    found = len([
-        scanner0_beacon_in_scanner1_space
-        for scanner0_beacon_in_scanner1_space in scanner0_beacons_in_scanner1_space
-        if (is_in_list(scanner0_beacon_in_scanner1_space, scanner1))
-    ])
-    
-    print(f"found {found} matching beacons")
-    
-    # for scanner0_beacon_in_scanner1_space in scanner0_beacons_in_scanner1_space:
-    #     if (is_in_list(scanner0_beacon_in_scanner1_space, scanner1)):
-    #         # it should match for enough beacons, and if so then we know that the coords of scanner1 in scanner0 space is difference
-    #         print(scanner0_beacon_in_scanner1_space)
-    #         found = sum([
-    #             1 if is_in_list(scanner0_beacon - difference, scanner1) else 0
-    #             for scanner0_beacon in scanner0
-    #         ])
+            found = len(overlaps)
+            # if found > 0:
+            #     print(f"{difference}, {rotation}: found {found}")
+            #     pprint(overlaps)
+            # if (rotation == 18):
+            # if (rotation == 6):
+            #     print(f"{difference}, {rotation}: found {found}")
+            
+            # print(f"found {found} matching beacons")
 
-    #         print(f"found {found} matching beacons")
-
-    #         if found >= overlap_requirement:
-    #             return difference
+            if found >= overlap_requirement:
+                return change_reference(difference, np.array([68,-1246,-43]), 6)
     return None
 
-res = find_scanner_coords(scanners[0], scanners[1], 12)
-print(res)
+# res = [
+#     [find_scanner_coords(base_scanner, scanner, 12) for scanner in scanners]
+#     for base_scanner in scanners
+#     ]
+res = find_scanner_coords(scanners[1], scanners[4], 12)
+# res = find_scanner_coords(scanners[0], scanners[1], 12)
+pprint(res)
+
+# scanner4_in_0 = np.array([-20,-1133,1061])
+
+# 0 > 1 > 4
+# 459,-707,401 > -391,539,-444 > -660, -479, -426
