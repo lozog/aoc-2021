@@ -1,3 +1,4 @@
+from collections import defaultdict
 import numpy as np
 from pprint import pprint
 import re
@@ -98,18 +99,81 @@ def find_scanner_coords(scanner0, scanner1, overlap_requirement):
                 # print(f"found {found} matching beacons")
 
                 if found >= overlap_requirement:
-                    return difference
-    return None
+                    return difference, overlaps, rotation
+    return None, None, None
 
 # res = [
-#     [find_scanner_coords(base_scanner, scanner, 12) for scanner in scanners]
+#     [find_scanner_coords(base_scanner, scanner, 12)[0] for scanner in scanners]
 #     for base_scanner in scanners
 #     ]
-res = find_scanner_coords(scanners[1], scanners[4], 12)
-pprint(res)
-res = find_scanner_coords(scanners[0], scanners[1], 12)
-pprint(res)
+# pprint(res)
+
+scanner_info = defaultdict(dict)
+
+# res, overlaps, rotation = find_scanner_coords(scanners[1], scanners[4], 12)
+# pprint(res)
+# coords, overlaps, rotation = find_scanner_coords(scanners[0], scanners[1], 12)
+# pprint(coords)
+# pprint(overlaps)
+# pprint(rotation)
 
 
-# 0 > 1 > 4
-# 459,-707,401 > -391,539,-444 > -660, -479, -426
+
+# scanner_info = dict(scanner_info)
+scanner_info = {0: {1: [np.array([   68, -1246,   -43]), 6]},
+ 1: {0: [np.array([  68, 1246,  -43]), 6],
+     3: [np.array([  160, -1134,   -23]), 0],
+     4: [np.array([   88,   113, -1104]), 10]},
+ 2: {4: [np.array([1125, -168,   72]), 11]},
+ 3: {1: [np.array([-160, 1134,   23]), 0]},
+ 4: {1: [np.array([-1104,   -88,   113]), 22],
+     2: [np.array([  168, -1125,    72]), 11]}}
+# pprint(scanner_info)
+
+zero_to_one = np.array([68, -1246, -43])
+one_to_three = np.array([160, -1134, -23])
+one_to_four = np.array([88, 113, -1104])
+two_to_four = np.array([1125, -168, 72])
+four_to_two = np.array([168, -1125, 72])
+
+
+four_to_zero = change_reference(one_to_four, scanner_info[0][1][0], scanner_info[0][1][1])
+# print(four_to_zero)
+
+three_to_zero = change_reference(one_to_three, scanner_info[0][1][0], scanner_info[0][1][1])
+# print(three_to_zero)
+
+two_to_one = change_reference(four_to_two, scanner_info[1][4][0], scanner_info[1][4][1])
+one_to_zero = change_reference(two_to_one, scanner_info[0][1][0], scanner_info[0][1][1])
+# print(one_to_zero)
+
+
+
+
+beacons_in_scanner0_space = []
+
+coords, overlaps, rotation = find_scanner_coords(scanners[0], scanners[1], 12)
+for overlap in overlaps:
+    if not is_in_list(overlap, beacons_in_scanner0_space):
+        beacons_in_scanner0_space.append(overlap)
+pprint(beacons_in_scanner0_space)
+# scanner_info[0][1] = [coords, rotation]
+# coords, overlaps, rotation = find_scanner_coords(scanners[1], scanners[0], 12)
+# scanner_info[1][0] = [coords, rotation]
+
+# coords, overlaps, rotation = find_scanner_coords(scanners[1], scanners[3], 12)
+# scanner_info[1][3] = [coords, rotation]
+# coords, overlaps, rotation = find_scanner_coords(scanners[3], scanners[1], 12)
+
+# pprint(overlaps)
+# scanner_info[3][1] = [coords, rotation]
+
+# coords, overlaps, rotation = find_scanner_coords(scanners[1], scanners[4], 12)
+# scanner_info[1][4] = [coords, rotation]
+# coords, overlaps, rotation = find_scanner_coords(scanners[4], scanners[1], 12)
+# scanner_info[4][1] = [coords, rotation]
+
+# coords, overlaps, rotation = find_scanner_coords(scanners[2], scanners[4], 12)
+# scanner_info[2][4] = [coords, rotation]
+# coords, overlaps, rotation = find_scanner_coords(scanners[4], scanners[2], 12)
+# scanner_info[4][2] = [coords, rotation]
