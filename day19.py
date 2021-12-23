@@ -4,6 +4,7 @@ from pprint import pprint
 import re
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import shortest_path
+from scipy.spatial.distance import cdist
 
 
 def is_in_list(x, arr):
@@ -222,6 +223,17 @@ scanner_info = {0: {8: [np.array([1097, -115, -112]), 1],
              34: {21: [np.array([ 130, 1234,  -29]), 11]}}
 
 
+# for test input
+# scanner_info = {0: {1: [np.array([   68, -1246,   -43]), 6]},
+#                 1: {0: [np.array([  68, 1246,  -43]), 6],
+#                     3: [np.array([  160, -1134,   -23]), 0],
+#                     4: [np.array([   88,   113, -1104]), 10]},
+#                 2: {4: [np.array([1125, -168,   72]), 11]},
+#                 3: {1: [np.array([-160, 1134,   23]), 0]},
+#                 4: {1: [np.array([-1104,   -88,   113]), 22],
+#                     2: [np.array([  168, -1125,    72]), 11]}}
+
+
 # we need to find out how to convert from any scanner to scanner 0
 path_matrix = np.array([
     np.array([1 if i in scanner_info[start].keys() else 0 for i in range(len(scanners))])
@@ -257,13 +269,35 @@ def convert_to_scanner0_space(beacon, path, scanner_info):
     )
 
 
-beacons_in_scanner0_space = []
-for i, scanner in enumerate(scanners):
-    path = get_path(Pr, i, 0)
-    for beacon in scanner:
-        beacon_in_scanner0_space = convert_to_scanner0_space(beacon, path, scanner_info)
-        if not is_in_list(beacon_in_scanner0_space, beacons_in_scanner0_space):
-            beacons_in_scanner0_space.append(beacon_in_scanner0_space)
+
+# beacons_in_scanner0_space = []
+# for i, scanner in enumerate(scanners):
+#     path = get_path(Pr, i, 0)
+#     for beacon in scanner:
+#         beacon_in_scanner0_space = convert_to_scanner0_space(beacon, path, scanner_info)
+#         if not is_in_list(beacon_in_scanner0_space, beacons_in_scanner0_space):
+#             beacons_in_scanner0_space.append(beacon_in_scanner0_space)
 
 # pprint(beacons_in_scanner0_space)
-print(len(beacons_in_scanner0_space))
+# print(len(beacons_in_scanner0_space))
+
+# part 2
+# find distances between scanners
+scanners_in_scanner0_space = []
+for i, scanner in enumerate(scanners):
+    if i == 0:
+        scanners_in_scanner0_space.append(np.array([0,0,0]))
+        continue
+    next_scanner = list(scanner_info[i].keys())[0]
+    scanner_coords = scanner_info[next_scanner][i][0]
+    path = get_path(Pr, next_scanner, 0)
+    scanner_in_scanner0_space = convert_to_scanner0_space(scanner_coords, path, scanner_info)
+    # print(f"{i} {path} {next_scanner} {scanner_coords} -> {scanner_in_scanner0_space}")
+    if not is_in_list(scanner_in_scanner0_space, scanners_in_scanner0_space):
+        scanners_in_scanner0_space.append(scanner_in_scanner0_space)
+
+
+# pprint(scanners_in_scanner0_space)
+distances = cdist(scanners_in_scanner0_space, scanners_in_scanner0_space, metric='cityblock')
+# pprint(distances)
+print(max(distances.flatten()))
