@@ -44,7 +44,7 @@ for line in lines:
 
 
 # p2
-END_SCORE = 21
+END_SCORE = 3
 rolls = defaultdict(int)
 for i in range(3):
     for j in range(3):
@@ -65,27 +65,29 @@ all_player_scores = all_p0_scores
 
 num_winning_universes = [0 for player in players]
 player = 0
-while any( [num_at_score > 0 for position in all_player_scores for num_at_score in position] ) :
-    # print(player)
+while True :
+    print(player)
     new_scores = [[0 for i in range(END_SCORE)] for position in range(10+1)]
 
     for position, scores in enumerate(all_player_scores):
         if position == 0:
+            # the game starts counting positions from 1
             continue
         for score, num_at_score in enumerate(scores):
             if num_at_score > 0:
                 # print(f"{position} {num_at_score}")
                 for roll, roll_count in rolls.items():
                     new_tile = (position + roll - 1) % 10 + 1
-                    new_score = min(score + new_tile, END_SCORE)
-                    # print(f"in {roll_count * num_at_score} universes, player {player} ends up on tile {new_tile} with score {new_score}")
+                    new_score = score + new_tile
+                    print(f"in {roll_count * num_at_score} universes, player {player} ends up on tile {new_tile} with score {new_score}")
 
-                    if new_score == END_SCORE:
-                        print(f"player {player} has won in {roll_count * num_at_score} more universes. removing them from play")
+                    if new_score >= END_SCORE:
+                        # print(f"{position} {roll} {new_tile} {score}")
+                        # print(f"player {player} has won in {roll_count * num_at_score} more universes. removing them from play")
                         num_winning_universes[player] += roll_count * num_at_score
                     else:
                         new_scores[new_tile][new_score] = roll_count * num_at_score
-                all_player_scores[position][score] -= num_at_score
+                # all_player_scores[position][score] -= num_at_score
 
     pprint(new_scores)
     if player == 0:
@@ -96,6 +98,13 @@ while any( [num_at_score > 0 for position in all_player_scores for num_at_score 
         all_p1_scores = new_scores
         player = 0
         all_player_scores = all_p0_scores
+
+    if (
+        all( [num_at_score == 0 for position in all_p0_scores for num_at_score in position] )
+        and all( [num_at_score == 0 for position in all_p1_scores for num_at_score in position] )
+    ):
+        break
+    print(num_winning_universes)
 
 
 print(num_winning_universes)
